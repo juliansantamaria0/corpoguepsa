@@ -123,5 +123,4 @@ Revisado en navegador (Chromium):
 - **Zoom del visor:** el primer cuadro coincide exactamente con cada tarjeta (0 px de diferencia) en escritorio y celular. Se probaron también el cierre con X y con Escape, el cierre tras cambiar de foto y la reapertura sin residuos.
 
 La preferencia `prefers-reduced-motion` no se pudo emular en el navegador de pruebas; su tratamiento se revisó en el código. Lo propio del tacto (hover pegado, destello al tocar, respuesta al presionar, barra del navegador) no se reproduce en la emulación de escritorio: conviene confirmarlo en un celular real.
-#   c o r p o g u e p s a  
- 
+#
