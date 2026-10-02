@@ -7,10 +7,12 @@ Sitio estático en HTML, CSS y JavaScript vanilla. No requiere framework, instal
 - `index.html`: estructura, contenido, metadatos (Open Graph y datos estructurados) y plantillas de los modales de servicios.
 - `styles.css`: diseño responsive, estados de interacción y animaciones.
 - `script.js`: menú, modales, visor de fotos, navegación por secciones, desplazamiento suave y apariciones al hacer scroll.
+- `favicon.ico`: ícono de la pestaña (logo de Corpoguepsa en círculo, 16, 32 y 48 px). Va en la raíz porque los navegadores lo buscan ahí.
 - `assets/`:
   - Cuatro fotografías en WebP con sus variantes reducidas (`-640`, `-1024`; la oficina usa `-480` y `-720`) para `srcset`.
   - `logo-168.webp`: logo usado en el encabezado y el pie.
   - `apple-touch-icon.png`: ícono al guardar la página en la pantalla de inicio del celular.
+  - `favicon-192.png`: logo en círculo para la pestaña en pantallas de alta densidad y accesos directos en Android.
   - `og-corpoguepsa.jpg` (1200×630): imagen de vista previa al compartir.
   - `logo.webp`: logo original en alta resolución, fuente de los anteriores. La página no lo carga.
 
