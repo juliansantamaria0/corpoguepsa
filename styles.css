@@ -947,11 +947,8 @@ dialog::backdrop {
   .about-images { padding-bottom: 100px; }
   .territory-note { right: -10px; width: 210px; }
 }
-@media (max-width: 760px) {
-  :root { --page: calc(100% - 40px); }
-  :root { --header-h: 82px; --header-compact: 58px; }
-  html { scroll-padding-top: 84px; }
-  header.scrolled .nav { padding-inline: 14px 8px; border-radius: 18px; }
+/* Menú desplegable hasta 1100 px: con seis enlaces el menú en línea ya no cabe en tablets */
+@media (max-width: 1100px) {
   .menu-toggle { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--navy); }
   .menu-toggle { transition: background-color .3s ease, color .3s ease, border-color .3s ease, transform .16s var(--ease-out); }
   .menu-toggle:active { transform: scale(.94); }
@@ -976,6 +973,16 @@ dialog::backdrop {
   nav>a:not(.button)::after { content: none; }
   nav>a[aria-current]:not(.button) { background: var(--pale); }
   nav .button { margin-top: 8px; }
+  /* En tablet el menú es una tarjeta alineada a la derecha, no una franja de todo el ancho */
+  nav { left: auto; width: min(340px, 100%); }
+}
+@media (max-width: 760px) {
+  :root { --page: calc(100% - 40px); }
+  :root { --header-h: 82px; --header-compact: 58px; }
+  html { scroll-padding-top: 84px; }
+  header.scrolled .nav { padding-inline: 14px 8px; border-radius: 18px; }
+  /* En celular el menú desplegado ocupa todo el ancho de la cápsula */
+  nav { left: 0; width: auto; }
   .hero { min-height: 0; margin-inline: 12px; border-radius: 16px; display: flex; flex-direction: column; }
   .hero-copy { padding: 40px 24px 30px; max-width: none; }
   h1 { font-size: clamp(2.7rem, 7.7vw, 4rem); }
@@ -1237,12 +1244,14 @@ dialog::backdrop {
 /* Menú móvil: la tarjeta cae suavemente y sus enlaces entran en cascada */
 @keyframes menu-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
 @keyframes menu-item-in { from { opacity: 0; translate: 0 -6px; } }
-@media (prefers-reduced-motion: no-preference) and (max-width: 760px) {
+@media (prefers-reduced-motion: no-preference) and (max-width: 1100px) {
   nav.open { animation: menu-in .4s var(--ease-out) both; }
   nav.open>* { animation: menu-item-in .45s var(--ease-out) both; }
   nav.open>:nth-child(2) { animation-delay: 40ms; }
   nav.open>:nth-child(3) { animation-delay: 80ms; }
   nav.open>:nth-child(4) { animation-delay: 120ms; }
+  nav.open>:nth-child(5) { animation-delay: 160ms; }
+  nav.open>:nth-child(6) { animation-delay: 200ms; }
 }
 @media (min-width: 1600px) { .contact-section { max-width: 1560px; margin-inline: auto; } }
 @media (max-width: 1100px) {
@@ -1639,4 +1648,331 @@ body.dialog-open .section-navigation {
   .hero-bottom { display: none; }
   .section { padding-block: 64px; }
   .services-intro { position: static; }
+}
+
+/* ===== Nuestra historia (dentro de "Somos Corpoguepsa") ===== */
+.history {
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  gap: clamp(48px, 7vw, 104px);
+  align-items: start;
+  margin-top: clamp(72px, 9vw, 120px);
+  padding-top: clamp(56px, 7vw, 88px);
+  border-top: 1px solid rgba(7, 60, 114, .1);
+}
+.history-intro h2>span { color: var(--blue); }
+.history-lead { margin-top: 24px; font-size: 1.0625rem; line-height: 1.75; color: var(--ink); }
+.history-intro>p:not(.history-lead) { margin-top: 16px; color: var(--muted); }
+.history-photo { margin: 32px 0 0; }
+.history-photo-frame { overflow: hidden; border-radius: var(--radius); box-shadow: 0 24px 48px -28px rgba(7, 60, 114, .45); }
+.history-photo-frame img { width: 100%; height: auto; aspect-ratio: 16 / 10; }
+.history-photo figcaption {
+  margin-top: 14px;
+  padding-left: 14px;
+  border-left: 2px solid var(--blue);
+  font-size: .875rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+/* La foto se descubre como una cortina y luego se acerca despacio mientras la sección cruza la pantalla */
+@keyframes photo-drift {
+  from { scale: 1.14; translate: 0 -3%; }
+  to { scale: 1.02; translate: 0 3%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .history-intro.reveal.visible .history-photo-frame { animation: media-in 1.2s var(--ease-out) .25s backwards; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .history-photo-frame img { animation: photo-drift linear both; animation-timeline: view(); animation-range: cover; }
+  }
+}
+
+/* ----- Línea de tiempo -----
+   Carril gris con un trazo de agua que se llena con el scroll (script.js) y una gota en la punta.
+   El carril va por debajo de los puntos; cada punto se llena cuando el agua lo alcanza. */
+.timeline-wrap { position: relative; }
+.timeline { position: relative; margin: 0; padding: 0 0 0 46px; list-style: none; }
+.timeline-rail {
+  position: absolute;
+  left: 11px;
+  top: 34px;
+  bottom: 34px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgba(7, 60, 114, .12);
+}
+.timeline-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--blue), #56caf0);
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+.timeline-drop {
+  position: absolute;
+  left: 50%;
+  top: -11px;
+  width: 16px;
+  height: 21px;
+  background: #56caf0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 18'%3E%3Cpath d='M7 0C5 4 1 7.5 1 11.5a6 6 0 0012 0C13 7.5 9 4 7 0Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 18'%3E%3Cpath d='M7 0C5 4 1 7.5 1 11.5a6 6 0 0012 0C13 7.5 9 4 7 0Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(86, 202, 240, .8));
+  opacity: 0;
+  transform: translate(-50%, 0);
+  transition: opacity .3s ease;
+}
+.timeline-drop.is-visible { opacity: 1; }
+
+.timeline-item {
+  position: relative;
+  padding: 22px 24px 24px;
+  border: 1px solid rgba(7, 60, 114, .07);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(7, 60, 114, .04), 0 14px 32px -24px rgba(7, 60, 114, .35);
+  transition: border-color .5s ease, box-shadow .6s var(--ease-out);
+}
+.timeline-item+.timeline-item { margin-top: 16px; }
+/* Punto: anillo gris mientras el agua no llega; al alcanzarlo se llena de azul con el centro blanco */
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: -46px;
+  top: 22px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #c6d6e2;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 4px #fff, 0 0 0 6px var(--pale);
+  transition: background-color .45s ease, border-color .45s ease, scale .5s var(--ease-out), box-shadow .5s ease;
+}
+/* Onda que se expande desde el punto al ser alcanzado, como una gota al caer en el agua */
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  left: -46px;
+  top: 22px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--blue);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.timeline-item.is-reached::before { border-color: var(--blue); background: var(--blue); }
+.timeline-item.is-current::before { scale: 1.18; box-shadow: inset 0 0 0 4px #fff, 0 0 0 6px var(--pale), 0 0 0 10px rgba(8, 123, 181, .14); }
+.timeline-item.is-current { border-color: rgba(8, 123, 181, .3); box-shadow: 0 1px 2px rgba(7, 60, 114, .04), 0 22px 44px -22px rgba(7, 60, 114, .45); }
+
+.timeline-date {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: #edf2f6;
+  color: var(--muted);
+  font: 700 .75rem/1.2 Manrope, sans-serif;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: background-color .45s ease, color .45s ease;
+}
+.timeline-item.is-reached .timeline-date { background: #e3f1f9; color: #0a6fa3; }
+.timeline-item.is-current .timeline-date { background: var(--blue); color: #fff; }
+.timeline-item h3 { margin-top: 12px; font-size: 1.25rem; letter-spacing: -.025em; color: var(--navy); }
+.timeline-item p { margin-top: 8px; font-size: .9875rem; line-height: 1.7; color: var(--muted); }
+.timeline-item strong { color: var(--ink); font-weight: 600; }
+/* La cifra reserva el ancho de su valor final (script.js) para que el texto no cambie de línea mientras cuenta */
+.timeline-item [data-count] { display: inline-block; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* El hito de 1980 se destaca: la inauguración del acueducto */
+.timeline-item.is-milestone {
+  border-color: transparent;
+  background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, .13) 50%, transparent 62%) var(--deep);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  box-shadow: 0 24px 48px -24px rgba(5, 44, 82, .6);
+}
+.timeline-item.is-milestone::after { border-color: var(--lime); }
+.timeline-item.is-milestone.is-reached::before { border-color: var(--deep); background: var(--lime); }
+.is-milestone .timeline-date { background: rgba(255, 255, 255, .12); color: #d3e2ed; }
+.is-milestone.is-reached .timeline-date, .is-milestone.is-current .timeline-date { background: var(--lime); color: var(--deep); }
+.is-milestone h3 { color: #fff; }
+.is-milestone p { color: #d3e2ed; }
+.timeline-item.is-milestone.is-current { border-color: transparent; box-shadow: 0 28px 56px -24px rgba(5, 44, 82, .7); }
+.history-source { grid-column: 1 / -1; font-size: .8125rem; color: var(--muted); }
+
+/* Las tarjetas entran desde la derecha, junto a la línea */
+@keyframes timeline-card-in { from { opacity: 0; translate: 32px 0; } }
+@keyframes timeline-ripple { from { opacity: .7; scale: 1; } to { opacity: 0; scale: 2.6; } }
+@keyframes milestone-shine { from { background-position: 130% 0; } to { background-position: -30% 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  .timeline-item.reveal { translate: 32px 0; }
+  .timeline-item.reveal.visible { translate: 0 0; animation: timeline-card-in .8s var(--ease-out) var(--reveal-delay, 0ms) backwards; }
+  .timeline-item.is-pulsing::after { animation: timeline-ripple .9s var(--ease-out); }
+  .timeline-item.is-milestone.is-celebrating { animation: milestone-shine 1.6s var(--ease-in-out); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .timeline-drop { display: none; }
+}
+@media (max-width: 920px) {
+  .history { grid-template-columns: 1fr; gap: 44px; }
+  .history-photo-frame img { aspect-ratio: 16 / 9; }
+}
+@media (max-width: 480px) {
+  .timeline { padding-left: 36px; }
+  .timeline-rail { left: 9px; top: 30px; bottom: 30px; }
+  .timeline-item { padding: 18px 18px 20px; }
+  .timeline-item::before, .timeline-item::after { left: -36px; width: 20px; height: 20px; top: 20px; }
+  .timeline-item::before { box-shadow: inset 0 0 0 3px #fff, 0 0 0 5px var(--pale); }
+  .timeline-item.is-current::before { box-shadow: inset 0 0 0 3px #fff, 0 0 0 5px var(--pale), 0 0 0 9px rgba(8, 123, 181, .14); }
+  .timeline-item h3 { font-size: 1.125rem; }
+}
+
+/* ===== Documentos y Transparencia ===== */
+.doc-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-bottom: 18px; }
+.doc-search { position: relative; flex: 1 1 260px; max-width: 360px; }
+.doc-search svg { position: absolute; left: 16px; top: 50%; translate: 0 -50%; width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
+.doc-search input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px 0 44px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font: 400 1rem/1.2 'DM Sans', sans-serif; /* 16 px: evita el zoom automático de iOS al enfocar */
+  transition: border-color .2s ease, box-shadow .25s ease;
+}
+.doc-search input::placeholder { color: var(--muted); }
+.doc-search input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(8, 123, 181, .14); }
+.doc-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.doc-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 8px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: #fff;
+  color: var(--ink);
+  font-size: .875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color .25s ease, border-color .25s ease, color .25s ease, transform .16s var(--ease-out);
+}
+.doc-filter b {
+  min-width: 24px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: var(--pale);
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 700;
+  text-align: center;
+  transition: background-color .25s ease, color .25s ease;
+}
+.doc-filter[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.doc-filter[aria-pressed="true"] b { background: rgba(255, 255, 255, .16); color: #fff; }
+.doc-filter:active { transform: scale(.96); }
+.doc-count { margin-bottom: 18px; font-size: .875rem; color: var(--muted); }
+.doc-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.doc-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 18px 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(7, 60, 114, .04);
+  transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out), border-color .3s ease;
+}
+/* Ícono por formato: hoja con la esquina doblada y la extensión en una etiqueta de color */
+.doc-icon { --fmt: var(--blue); --fmt-bg: #e9f4fa; position: relative; display: grid; place-items: center; width: 46px; height: 56px; flex-shrink: 0; }
+.doc-icon[data-format="pdf"] { --fmt: #cf3b3b; --fmt-bg: #fdeeee; }
+.doc-icon:is([data-format="doc"], [data-format="docx"]) { --fmt: #2b6cb0; --fmt-bg: #ebf3fb; }
+.doc-icon:is([data-format="xls"], [data-format="xlsx"], [data-format="csv"]) { --fmt: #2f855a; --fmt-bg: #eaf6ef; }
+.doc-icon svg { width: 44px; height: 55px; fill: var(--fmt-bg); stroke: var(--fmt); stroke-width: 1.6; stroke-linejoin: round; }
+.doc-icon b {
+  position: absolute;
+  left: 50%;
+  bottom: 9px;
+  translate: -50% 0;
+  padding: 3px 5px;
+  border-radius: 4px;
+  background: var(--fmt);
+  color: #fff;
+  font: 800 .625rem/1 Manrope, sans-serif;
+  letter-spacing: .04em;
+}
+.doc-category { display: block; margin-bottom: 4px; font-size: .6875rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #0a6fa3; }
+.doc-title { font: 650 1rem/1.4 Manrope, sans-serif; letter-spacing: -.01em; color: var(--navy); overflow-wrap: anywhere; }
+.doc-meta { display: flex; flex-wrap: wrap; margin-top: 6px; font-size: .8125rem; color: var(--muted); }
+.doc-meta>*+*::before { content: '·'; margin: 0 8px; }
+.doc-actions { display: flex; align-items: center; gap: 8px; }
+.doc-view, .doc-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 12px;
+  color: var(--navy);
+  transition: background-color .25s ease, border-color .25s ease, color .25s ease, transform .16s var(--ease-out);
+}
+.doc-view { gap: 7px; padding: 0 14px; background: var(--pale); font-size: .875rem; font-weight: 600; }
+.doc-download { width: 40px; border: 1px solid var(--line); background: #fff; }
+.doc-view svg, .doc-download svg { width: 17px; height: 17px; transition: transform .35s var(--ease-out); }
+.doc-view:active, .doc-download:active { transform: scale(.94); }
+.doc-empty { padding: 40px 20px; border: 1px dashed rgba(7, 60, 114, .2); border-radius: 18px; text-align: center; color: var(--muted); }
+.doc-reset, .doc-more {
+  min-height: 46px;
+  padding: 0 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--navy);
+  font-weight: 600;
+  transition: border-color .25s ease, color .25s ease, transform .16s var(--ease-out);
+}
+.doc-reset { margin-top: 16px; }
+.doc-more { display: flex; align-items: center; margin: 26px auto 0; }
+.doc-more[hidden] { display: none; }
+.doc-reset:active, .doc-more:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) {
+  .doc-filter:not([aria-pressed="true"]):hover { border-color: rgba(8, 123, 181, .45); color: var(--blue); }
+  .doc-card:hover { transform: translateY(-3px); border-color: rgba(8, 123, 181, .3); box-shadow: 0 20px 40px -22px rgba(7, 60, 114, .35); }
+  .doc-view:hover { background: var(--navy); color: #fff; }
+  .doc-view:hover svg { transform: translate(2px, -2px); }
+  .doc-download:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .doc-download:hover svg { transform: translateY(2px); }
+  .doc-reset:hover, .doc-more:hover { border-color: var(--blue); color: var(--blue); }
+}
+/* Al filtrar o ampliar, las fichas entran en cascada */
+@keyframes doc-in { from { opacity: 0; translate: 0 10px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .doc-list.is-animating .doc-card { animation: doc-in .5s var(--ease-out) calc(var(--i, 0) * 35ms) backwards; }
+}
+@media (max-width: 920px) {
+  .doc-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .doc-search { max-width: none; flex-basis: 100%; }
+  /* En el celular las categorías forman una fila deslizable en lugar de varias líneas */
+  .doc-filters {
+    flex-wrap: nowrap;
+    width: calc(100% + 40px);
+    margin-inline: -20px;
+    padding: 2px 20px 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .doc-filters::-webkit-scrollbar { display: none; }
+  .doc-card { grid-template-columns: auto minmax(0, 1fr); gap: 14px 16px; padding: 16px; }
+  .doc-actions { grid-column: 2; }
 }

@@ -1,0 +1,8 @@
+# Archivos binarios: git nunca debe convertir sus finales de línea (se corromperían).
+# Garantiza que los documentos e imágenes publicados sean idénticos a los originales.
+*.pdf  binary
+*.webp binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary

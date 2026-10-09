@@ -9,14 +9,16 @@
     <!-- La página está diseñada en modo claro: evita que el modo oscuro forzado de algunos navegadores invierta sus colores -->
     <meta name="color-scheme" content="light">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-    <!-- Vista previa al compartir (WhatsApp, Facebook, etc.). Al publicar, cambia og:image por la URL absoluta,
-         por ejemplo https://tu-dominio/assets/og-corpoguepsa.jpg, y agrega og:url con la dirección del sitio. -->
+    <!-- Dirección oficial del sitio. Si se conecta un dominio propio, actualízala aquí, en og:url, og:image y en los datos estructurados. -->
+    <link rel="canonical" href="https://corpoguepsa.vercel.app/">
+    <!-- Vista previa al compartir (WhatsApp, Facebook, etc.): la imagen necesita la URL absoluta para mostrarse -->
     <meta property="og:type" content="website">
     <meta property="og:locale" content="es_CO">
     <meta property="og:site_name" content="Corpoguepsa">
+    <meta property="og:url" content="https://corpoguepsa.vercel.app/">
     <meta property="og:title" content="Corpoguepsa | Acueducto, alcantarillado y aseo en Güepsa">
     <meta property="og:description" content="Corporación de servicios de agua potable y saneamiento básico de Güepsa, Santander. Acueducto, alcantarillado, aseo y atención a la comunidad.">
-    <meta property="og:image" content="assets/og-corpoguepsa.jpg">
+    <meta property="og:image" content="https://corpoguepsa.vercel.app/assets/og-corpoguepsa.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Planta de tratamiento de Corpoguepsa entre las montañas de Güepsa">
@@ -27,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&amp;family=Manrope:wght@400;500;600;650;700;750;800&amp;display=swap">
-    <link rel="stylesheet" href="styles.css?v=21">
+    <link rel="stylesheet" href="styles.css?v=24">
     <!-- Datos estructurados: ayudan a los buscadores a mostrar nombre, teléfono, correo y ubicación -->
     <script type="application/ld+json">
       {
@@ -35,6 +37,8 @@
         "@type": "Organization",
         "name": "Corpoguepsa",
         "alternateName": "Corporación de Servicios de Agua Potable y Saneamiento Básico de Güepsa",
+        "url": "https://corpoguepsa.vercel.app/",
+        "logo": "https://corpoguepsa.vercel.app/assets/favicon-192.png",
         "description": "Servicios de acueducto, alcantarillado y aseo en el municipio de Güepsa, Santander.",
         "telephone": "+57 316 784 6946",
         "email": "corpoguepsa@gmail.com",
@@ -44,7 +48,8 @@
           "addressRegion": "Santander",
           "addressCountry": "CO"
         },
-        "areaServed": "Güepsa, Santander, Colombia"
+        "areaServed": "Güepsa, Santander, Colombia",
+        "hasMap": "https://www.google.com/maps/search/?api=1&query=G%C3%BCepsa%2C%20Santander%2C%20Colombia"
       }
     </script>
   </head>
@@ -64,7 +69,9 @@
         <nav id="menu" aria-label="Navegación principal">
           <a href="#servicios">Servicios</a>
           <a href="#nosotros">Nosotros</a>
+          <a href="#historia">Historia</a>
           <a href="#instalaciones">Instalaciones</a>
+          <a href="#documentos">Documentos</a>
           <a href="#contacto" class="button small">Contáctanos</a>
         </nav>
         <div class="scroll-progress" aria-hidden="true"></div>
@@ -212,6 +219,54 @@
             </div>
           </div>
         </div>
+        <!-- Nuestra historia: contenido tomado de la reseña histórica institucional (sitio anterior, corpoguepsa.com).
+             La línea de tiempo solo incluye fechas que aparecen en esa reseña. -->
+        <div class="wrap history" id="historia" data-section="">
+          <div class="history-intro">
+            <div class="eyebrow">NUESTRA HISTORIA</div>
+            <h2>El agua que nos une<br><span>tiene historia.</span></h2>
+            <p class="history-lead">Según el profesor e historiador Luis Amadeo Gaona Cepeda, desde la época indígena Güepsa se ha servido de las aguas del río Suárez —llamado por los indígenas río Sarabita— y de la quebrada El Ropero.</p>
+            <p>Antes de tener acueducto, la población urbana se surtía del agua de algunos aljibes locales; para bañarse, la gente iba a las duchas públicas de Segundo Herreño, en la llamada «calle de los tramposos», en la parte occidental del pueblo.</p>
+            <figure class="history-photo">
+              <div class="history-photo-frame">
+              <img src="assets/planta-profesional-640.webp" srcset="assets/planta-profesional-640.webp 640w, assets/planta-profesional-1024.webp 1024w" sizes="(max-width: 920px) calc(100vw - 40px), 460px" alt="Tanques de la planta de tratamiento de Corpoguepsa" width="1672" height="941" loading="lazy" decoding="async">
+              </div>
+              <figcaption>Hoy, las aguas del río Suárez (por bombeo) y del aljibe El Pozón, nacimiento de la quebrada Las Flores, surten el acueducto comunitario de Güepsa.</figcaption>
+            </figure>
+          </div>
+          <!-- El carril se llena con el scroll (script.js) y una gota lo recorre; cada punto se activa al alcanzarlo -->
+          <div class="timeline-wrap">
+          <span class="timeline-rail" aria-hidden="true"><span class="timeline-fill"></span><span class="timeline-drop"></span></span>
+          <ol class="timeline">
+            <li class="timeline-item">
+              <span class="timeline-date">Década de 1950</span>
+              <h3>Nace el primer acueducto</h3>
+              <p>La Sociedad de Acueductos y Alcantarillado de Santander, junto con la comunidad, construye el acueducto con el agua del aljibe Las Florez, en predios de la familia Herrera Santamaría, vereda Santa Rosa. Surtía a <strong><span data-count="130">130</span> familias</strong>.</p>
+            </li>
+            <li class="timeline-item">
+              <span class="timeline-date">1962</span>
+              <h3>Crece la red</h3>
+              <p>El acueducto alcanza <strong><span data-count="162">162</span> suscriptores</strong>.</p>
+            </li>
+            <li class="timeline-item">
+              <span class="timeline-date"><time datetime="1977-03-21">21 de marzo de 1977</time></span>
+              <h3>Un nuevo acueducto para Güepsa</h3>
+              <p>Ante las deficiencias del servicio, el Instituto Nacional de Salud (INAS) y la comunidad de Güepsa firman un contrato para construir un nuevo acueducto y reemplazar el deteriorado, manejado por Emposan desde su creación.</p>
+            </li>
+            <li class="timeline-item">
+              <span class="timeline-date"><time datetime="1977-05">Mayo de 1977</time></span>
+              <h3>Comienzan las obras</h3>
+              <p>Se inician los trabajos del nuevo acueducto.</p>
+            </li>
+            <li class="timeline-item is-milestone">
+              <span class="timeline-date"><time datetime="1980-06-13">13 de junio de 1980</time></span>
+              <h3>Inauguración</h3>
+              <p>Después de algunas interrupciones, se inaugura la obra. La reseña destaca la colaboración del INAS seccional Santander y de su director, el ingeniero Guillermo Lozano Bravo, y la entrega del señor Alfonso Hernández Cárdenas, auxiliar técnico del INAS, que acompañó la obra durante toda su ejecución.</p>
+            </li>
+          </ol>
+          </div>
+          <p class="history-source">Fuente: reseña histórica de Corpoguepsa, a partir de la investigación del profesor e historiador Luis Amadeo Gaona Cepeda.</p>
+        </div>
       </section>
       <section class="section wrap" id="instalaciones" data-section="">
         <div class="section-heading">
@@ -256,6 +311,37 @@
           </button>
         </div>
       </section>
+      <!-- Documentos y Transparencia: las fichas se generan desde documentos/registro.js -->
+      <section class="section wrap documents" id="documentos" data-section="">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">INFORMACIÓN INSTITUCIONAL</div>
+            <h2>Documentos y Transparencia</h2>
+          </div>
+          <p>Consulta los documentos institucionales y la información de interés público de Corpoguepsa.</p>
+        </div>
+        <div class="doc-toolbar">
+          <div class="doc-search">
+            <label class="sr-only" for="doc-search">Buscar documento por nombre</label>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.5-3.5"></path>
+            </svg>
+            <input id="doc-search" type="search" placeholder="Buscar por nombre" autocomplete="off" enterkeyhint="search">
+          </div>
+          <div class="doc-filters" role="group" aria-label="Filtrar documentos por categoría"></div>
+        </div>
+        <p class="doc-count" id="doc-count" aria-live="polite"></p>
+        <ul class="doc-list" id="doc-list"></ul>
+        <div class="doc-empty" id="doc-empty" hidden>
+          <p></p>
+          <button type="button" class="doc-reset">Ver todos los documentos</button>
+        </div>
+        <button type="button" class="doc-more" id="doc-more" aria-controls="doc-list" aria-expanded="false" hidden></button>
+        <noscript>
+          <p class="doc-count">Activa JavaScript para consultar la biblioteca de documentos.</p>
+        </noscript>
+      </section>
       <section id="contacto" class="contact-section" data-section="">
         <div class="wrap contact-grid">
           <div>
@@ -297,7 +383,8 @@
                 <small>Enviar un correo</small>
               </div>
             </a>
-            <div class="contact-row">
+            <!-- Abre Google Maps centrado en el municipio (en el celular abre la app de Maps) -->
+            <a class="contact-row" href="https://www.google.com/maps/search/?api=1&amp;query=G%C3%BCepsa%2C%20Santander%2C%20Colombia" target="_blank" rel="noopener">
               <span class="contact-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
                   <path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1114 0Z"></path>
@@ -307,9 +394,9 @@
               <div>
                 <span>Nuestro municipio</span>
                 <strong>Güepsa, Santander</strong>
-                <small>Colombia</small>
+                <small>Ver en Google Maps<span class="sr-only"> (se abre en una pestaña nueva)</span></small>
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </section>
@@ -355,7 +442,9 @@
           <h3>Conoce Corpoguepsa</h3>
           <a href="#servicios">Nuestros servicios</a>
           <a href="#nosotros">Quiénes somos</a>
+          <a href="#historia">Nuestra historia</a>
           <a href="#instalaciones">Nuestras instalaciones</a>
+          <a href="#documentos">Documentos</a>
         </div>
         <div class="footer-links">
           <h3>Estamos cerca</h3>
@@ -496,6 +585,7 @@
       </div>
       <p class="service-hours">Los horarios de recolección y de atención deben confirmarse con la corporación según tu sector.</p>
     </template>
-    <script src="script.js?v=21"></script>
+    <script src="documentos/registro.js?v=1"></script>
+    <script src="script.js?v=25"></script>
   </body>
 </html>

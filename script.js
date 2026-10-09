@@ -27,7 +27,8 @@ document.addEventListener('keydown', event => {
     menuToggle.focus();
   }
 });
-window.matchMedia('(min-width: 761px)').addEventListener('change', event => {
+// El menú desplegable se usa hasta 1100 px (styles.css); al pasar a pantalla amplia se cierra.
+window.matchMedia('(min-width: 1101px)').addEventListener('change', event => {
   if (event.matches) closeMenu();
 });
 
@@ -307,7 +308,9 @@ const sectionNames = {
   inicio: 'Inicio',
   servicios: 'Nuestros servicios',
   nosotros: 'Quiénes somos',
+  historia: 'Nuestra historia',
   instalaciones: 'Instalaciones',
+  documentos: 'Documentos',
   contacto: 'Contacto',
   preguntas: 'Preguntas frecuentes',
   'pie-pagina': 'Pie de página'
@@ -432,6 +435,235 @@ window.addEventListener('load', requestPositionUpdate, { once: true });
 document.fonts?.ready.then(requestPositionUpdate);
 updatePagePosition();
 
+/* ===== Nuestra historia: la línea de tiempo se llena como agua que avanza con el scroll ===== */
+(() => {
+  const wrap = document.querySelector('.timeline-wrap');
+  if (!wrap) return;
+  const rail = wrap.querySelector('.timeline-rail');
+  const fill = wrap.querySelector('.timeline-fill');
+  const drop = wrap.querySelector('.timeline-drop');
+  const items = [...wrap.querySelectorAll('.timeline-item')];
+  const READING_LINE = 0.6; // Un punto se activa cuando cruza el 60 % de la altura de la pantalla.
+  let anchors = [];
+  let start = 0;
+  let length = 0;
+  let frame = null;
+  let lastCurrent = -1;
+
+  // Centro vertical de cada punto dentro del contenedor; el carril va del primero al último.
+  function measure() {
+    anchors = items.map(item => {
+      const dot = getComputedStyle(item, '::before');
+      return item.offsetTop + parseFloat(dot.top) + parseFloat(dot.height) / 2;
+    });
+    start = anchors[0];
+    length = anchors[anchors.length - 1] - start;
+    rail.style.top = `${start}px`;
+    rail.style.bottom = 'auto';
+    rail.style.height = `${length}px`;
+    update();
+  }
+
+  // Las cifras cuentan desde cero la primera vez que su acontecimiento se activa.
+  function countUp(item) {
+    item.querySelectorAll('[data-count]').forEach(number => {
+      if (number.dataset.counted || reducedMotion.matches) return;
+      number.dataset.counted = 'true';
+      const target = Number(number.dataset.count);
+      number.style.minWidth = `${number.getBoundingClientRect().width}px`; // Ancho del valor final.
+      const startTime = performance.now();
+      const step = now => {
+        const progress = Math.min(1, (now - startTime) / 1100);
+        number.textContent = Math.round(target * (1 - Math.pow(1 - progress, 3)));
+        if (progress < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    });
+  }
+
+  // Al alcanzar un punto: onda desde el punto, cifras que cuentan y, en el hito, un destello.
+  function arrive(item) {
+    if (reducedMotion.matches) return;
+    item.classList.remove('is-pulsing');
+    void item.offsetWidth; // Reinicia la onda si el punto se vuelve a alcanzar.
+    item.classList.add('is-pulsing');
+    countUp(item);
+    if (item.classList.contains('is-milestone')) item.classList.add('is-celebrating');
+  }
+
+  function update() {
+    frame = null;
+    const reached = window.innerHeight * READING_LINE - wrap.getBoundingClientRect().top;
+    const progress = length ? Math.min(1, Math.max(0, (reached - start) / length)) : 0;
+    fill.style.transform = `scaleY(${progress})`;
+    drop.style.transform = `translate(-50%, ${progress * length}px)`;
+    drop.classList.toggle('is-visible', progress > 0.005 && progress < 0.995);
+    let current = -1;
+    items.forEach((item, index) => {
+      const isReached = anchors[index] <= reached + 0.5;
+      item.classList.toggle('is-reached', isReached);
+      if (isReached) current = index;
+    });
+    items.forEach((item, index) => item.classList.toggle('is-current', index === current));
+    // Solo hay onda al avanzar hacia abajo, no al regresar.
+    if (current > lastCurrent) items.slice(lastCurrent + 1, current + 1).forEach(arrive);
+    lastCurrent = current;
+  }
+
+  const requestUpdate = () => { if (!frame) frame = window.requestAnimationFrame(update); };
+  items.forEach(item => item.addEventListener('animationend', event => {
+    if (event.pseudoElement === '::after') item.classList.remove('is-pulsing');
+  }));
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  // Cualquier cambio de tamaño de la línea (fuentes, ancho de pantalla, textos) vuelve a medir el carril.
+  if ('ResizeObserver' in window) new ResizeObserver(() => measure()).observe(wrap.querySelector('.timeline'));
+  else window.addEventListener('resize', () => window.requestAnimationFrame(measure), { passive: true });
+  window.addEventListener('load', measure, { once: true });
+  document.fonts?.ready.then(measure);
+  measure();
+})();
+
+/* ===== Documentos y Transparencia: biblioteca generada desde documentos/registro.js ===== */
+(() => {
+  const list = document.querySelector('#doc-list');
+  if (!list) return;
+  const registry = Array.isArray(window.CORPOGUEPSA_DOCUMENTOS) ? window.CORPOGUEPSA_DOCUMENTOS : [];
+  const categories = window.CORPOGUEPSA_CATEGORIAS || {};
+  const search = document.querySelector('#doc-search');
+  const filters = document.querySelector('.doc-filters');
+  const count = document.querySelector('#doc-count');
+  const empty = document.querySelector('#doc-empty');
+  const more = document.querySelector('#doc-more');
+  const INITIAL = 8; // Sin filtros se muestran los más recientes; el resto con "Ver todos".
+  const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  const FORMATS = { pdf: 'PDF', doc: 'Word', docx: 'Word', xls: 'Excel', xlsx: 'Excel', csv: 'CSV', ppt: 'PowerPoint', pptx: 'PowerPoint', jpg: 'imagen', jpeg: 'imagen', png: 'imagen', zip: 'ZIP' };
+  const FILE_ICON = '<svg viewBox="0 0 32 40" aria-hidden="true"><path d="M7 1.5h13l10.5 10.5v22.5a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-29a4 4 0 0 1 4-4Z"/><path d="M20 1.5V9a3 3 0 0 0 3 3h7.5"/></svg>';
+  const VIEW_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>';
+  const DOWNLOAD_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
+
+  const normalize = text => String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const extensionOf = file => (file.split(/[?#]/)[0].split('.').pop() || '').toLowerCase();
+  const formatDate = value => {
+    const [year, month, day] = String(value || '').split('-').map(Number);
+    if (!year) return '';
+    if (!month) return String(year);
+    return (day ? `${day} de ` : '') + `${MONTHS[month - 1]} de ${year}`;
+  };
+
+  // Más recientes primero; los que no tienen fecha van al final.
+  const items = registry
+    .filter(doc => doc && doc.titulo && doc.archivo)
+    .map(doc => ({ ...doc, ext: extensionOf(doc.archivo), key: normalize(`${doc.titulo} ${categories[doc.categoria] || ''}`) }))
+    .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')) || a.titulo.localeCompare(b.titulo, 'es'));
+
+  let category = 'todos';
+  let expanded = false;
+
+  // Filtros por categoría (solo las que tienen documentos), cada uno con su cantidad.
+  const usedCategories = Object.keys(categories).filter(key => items.some(doc => doc.categoria === key));
+  const addFilter = (key, label, total) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'doc-filter';
+    button.dataset.category = key;
+    button.append(Object.assign(document.createElement('span'), { textContent: label }), Object.assign(document.createElement('b'), { textContent: total }));
+    button.addEventListener('click', () => { category = key; expanded = false; render(true); });
+    filters.append(button);
+  };
+  if (usedCategories.length > 1) {
+    addFilter('todos', 'Todos', items.length);
+    usedCategories.forEach(key => addFilter(key, categories[key], items.filter(doc => doc.categoria === key).length));
+  } else {
+    filters.hidden = true;
+  }
+
+  const buildCard = (doc, index) => {
+    const format = FORMATS[doc.ext] || doc.ext.toUpperCase() || 'archivo';
+    const date = formatDate(doc.fecha);
+    const card = document.createElement('li');
+    card.className = 'doc-card';
+    card.style.setProperty('--i', index);
+    card.innerHTML = `
+      <span class="doc-icon" aria-hidden="true">${FILE_ICON}<b></b></span>
+      <div class="doc-info">
+        <span class="doc-category"></span>
+        <h3 class="doc-title"></h3>
+        <p class="doc-meta"></p>
+      </div>
+      <div class="doc-actions">
+        <a class="doc-view" target="_blank" rel="noopener">${VIEW_ICON}<span>Ver</span></a>
+        <a class="doc-download">${DOWNLOAD_ICON}<span class="sr-only">Descargar</span></a>
+      </div>`;
+    card.querySelector('.doc-icon').dataset.format = doc.ext;
+    card.querySelector('.doc-icon b').textContent = doc.ext.toUpperCase().slice(0, 4);
+    card.querySelector('.doc-category').textContent = categories[doc.categoria] || 'Documento';
+    card.querySelector('.doc-title').textContent = doc.titulo;
+    // El formato ya se ve en el ícono; aquí van la fecha de publicación y el peso del archivo.
+    const meta = card.querySelector('.doc-meta');
+    if (date) {
+      const published = Object.assign(document.createElement('span'), { textContent: 'Publicado en ' });
+      published.append(Object.assign(document.createElement('time'), { dateTime: doc.fecha, textContent: date }));
+      meta.append(published);
+    }
+    if (doc.tamano) meta.append(Object.assign(document.createElement('span'), { textContent: doc.tamano }));
+    const view = card.querySelector('.doc-view');
+    view.href = doc.archivo;
+    view.setAttribute('aria-label', `Ver ${doc.titulo} (${format}, se abre en una pestaña nueva)`);
+    const download = card.querySelector('.doc-download');
+    download.href = doc.archivo;
+    download.setAttribute('download', doc.archivo.split('/').pop());
+    download.setAttribute('aria-label', `Descargar ${doc.titulo} (${[format, doc.tamano].filter(Boolean).join(', ')})`);
+    download.title = 'Descargar';
+    return card;
+  };
+
+  function render(animate = false) {
+    const raw = search.value.trim();
+    const query = normalize(raw);
+    const filtering = category !== 'todos' || query !== '';
+    const matches = items.filter(doc => (category === 'todos' || doc.categoria === category) && (!query || doc.key.includes(query)));
+    const visible = filtering || expanded ? matches : matches.slice(0, INITIAL);
+
+    list.classList.toggle('is-animating', animate && !reducedMotion.matches);
+    list.replaceChildren(...visible.map(buildCard));
+    filters.querySelectorAll('.doc-filter').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === category)));
+
+    const noun = total => `${total} ${total === 1 ? 'documento' : 'documentos'}`;
+    count.textContent = !items.length ? '' : filtering ? `${matches.length === 1 ? 'Se encontró' : 'Se encontraron'} ${noun(matches.length)} de ${items.length}` : `${noun(items.length)} disponibles`;
+
+    empty.hidden = matches.length > 0;
+    if (!matches.length) {
+      empty.querySelector('p').textContent = !items.length
+        ? 'Muy pronto publicaremos aquí los documentos institucionales de Corpoguepsa.'
+        : query ? `No encontramos documentos con «${raw}». Prueba con otra palabra o revisa otra categoría.` : 'Aún no hay documentos en esta categoría.';
+      empty.querySelector('.doc-reset').hidden = !items.length;
+    }
+
+    more.hidden = filtering || matches.length <= INITIAL;
+    more.textContent = expanded ? 'Mostrar menos' : `Ver los ${items.length} documentos`;
+    more.setAttribute('aria-expanded', String(expanded));
+  }
+
+  search.addEventListener('input', () => render(false));
+  empty.querySelector('.doc-reset').addEventListener('click', () => {
+    search.value = '';
+    category = 'todos';
+    render(true);
+    search.focus();
+  });
+  more.addEventListener('click', () => {
+    expanded = !expanded;
+    render(expanded);
+    // Al contraer, si la lista quedó por encima de la pantalla, vuelve al inicio de la sección.
+    if (!expanded && list.getBoundingClientRect().bottom < 0) {
+      const section = document.querySelector('#documentos');
+      const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      smoothScrollTo(section.getBoundingClientRect().top + window.scrollY - padding);
+    }
+  });
+  render(false);
+})();
+
 /* ===== Acordeón FAQ fluido sin saltos de pantalla (Web Animations API) ===== */
 class SmoothAccordion {
   constructor(el) {
@@ -516,9 +748,10 @@ document.querySelectorAll('.questions details').forEach(details => new SmoothAcc
 
 /* ===== Revelación con cascada; contenido visible si no hay soporte ===== */
 const revealTargets = [...document.querySelectorAll(
-  '.section-heading, .service-card, .about-images, .about-copy, .gallery-item, .contact-grid>div, .faq>div, .footer-main>*'
+  '.section-heading, .service-card, .about-images, .about-copy, .gallery-item, .contact-grid>div, .faq>div, .footer-main>*, ' +
+  '.history-intro, .timeline-item, .history-source, .doc-toolbar, .doc-list'
 )];
-document.querySelectorAll('.service-list, .gallery, .about-grid, .contact-grid, .faq, .footer-main').forEach(group => {
+document.querySelectorAll('.service-list, .gallery, .about-grid, .contact-grid, .faq, .footer-main, .timeline').forEach(group => {
   [...group.children].forEach((child, index) => child.style.setProperty('--reveal-delay', `${index * 90}ms`));
 });
 let revealObserver;

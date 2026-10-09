@@ -15,17 +15,24 @@ Sitio estático en HTML, CSS y JavaScript vanilla. No requiere framework, instal
   - `favicon-192.png`: logo en círculo para la pestaña en pantallas de alta densidad y accesos directos en Android.
   - `og-corpoguepsa.jpg` (1200×630): imagen de vista previa al compartir.
   - `logo.webp`: logo original en alta resolución, fuente de los anteriores. La página no lo carga.
+- `documentos/`: biblioteca de "Documentos y Transparencia".
+  - `registro.js`: registro central con el título, la categoría, la ruta, la fecha y el peso de cada documento. La sección se genera a partir de este archivo.
+  - Una subcarpeta por categoría (`estados-financieros/`, `comunicados-y-convocatorias/`, `estatutos/`, `contratos/`, `servicio-de-aseo/`) con los PDF.
 
-## Antes de publicar
+## Publicación
 
-1. En `index.html`, cambia `og:image` por la URL absoluta (`https://tu-dominio/assets/og-corpoguepsa.jpg`) y agrega `<meta property="og:url" content="https://tu-dominio/">`. Sin la URL completa, WhatsApp y Facebook no muestran la imagen.
-2. No subas la carpeta `_respaldo/`: es una copia de la versión anterior, solo para comparar.
-3. Opcional: `assets/logo.webp` no es necesario en el servidor.
-4. Prueba en un celular real el enlace de WhatsApp, la llamada y el correo.
+El sitio está publicado en Vercel: <https://corpoguepsa.vercel.app/>. Se vuelve a desplegar solo con cada push a la rama `main` del repositorio en GitHub.
+
+- La dirección del sitio aparece en cuatro lugares de `index.html`: `canonical`, `og:url`, `og:image` y los datos estructurados. Si se conecta un dominio propio, actualízala en todos.
+- `_respaldo/` (copia local de la versión anterior) está en `.gitignore` y no se publica.
+- Opcional: `assets/logo.webp` no es necesario en el servidor.
+- `documentos/` pesa unos 181 MB: varios PDF son escaneos grandes (los estatutos de la corporación, 53 MB; los estados financieros 2018–2022, entre 17 y 33 MB). GitHub muestra una advertencia con archivos de más de 50 MB, pero los acepta. Si en algún momento se consiguen versiones digitales más livianas, basta con reemplazar el archivo y actualizar su peso en `registro.js`.
+- Prueba en un celular real el enlace de WhatsApp, la llamada y el correo.
+- Para comprobar la vista previa al compartir, pega la dirección en el depurador de Facebook (<https://developers.facebook.com/tools/debug/>); también refresca la caché de la vista previa.
 
 ## Integración
 
-1. Conserva juntos `index.html`, `styles.css`, `script.js` y la carpeta `assets`.
+1. Conserva juntos `index.html`, `styles.css`, `script.js`, `favicon.ico` y las carpetas `assets` y `documentos`.
 2. Abre `index.html` en un navegador moderno o copia esos archivos a la carpeta pública de tu hosting estático.
 3. Si integras las secciones en otra página, incluye `styles.css` y coloca `script.js` al final del `body` o cárgalo con `defer`. Conserva los IDs y atributos `data-*` usados por el script.
 
@@ -37,6 +44,24 @@ Las fuentes se cargan desde Google Fonts; si no hay conexión se usan las fuente
 - Encabezado fijo: arriba es una barra blanca amplia; al desplazarse se transforma en una cápsula de cristal compacta, con el logo más pequeño y una línea de progreso de lectura.
 - Servicios en lista editorial. Al pasar el cursor, cada fila se eleva con sombra suave, un halo interior y un borde que se ilumina siguiendo al puntero; el ícono se rellena y la flecha avanza.
 - Franja tipográfica bajo el hero, ondas de agua tenues como textura en "Nosotros" y contacto, y la palabra "Corpoguepsa" como marca de agua en el pie.
+
+### Nuestra historia
+- Integrada en "Somos Corpoguepsa" (ancla `#historia`), con texto editorial, una fotografía de la planta y una línea de tiempo.
+- El contenido proviene de la reseña histórica institucional publicada en el sitio anterior (corpoguepsa.com), basada en la investigación del profesor e historiador Luis Amadeo Gaona Cepeda.
+- La línea de tiempo solo incluye fechas que aparecen en la reseña: década de 1950, 1962, 21 de marzo de 1977, mayo de 1977 y 13 de junio de 1980. Lo que no tiene fecha (época indígena, los aljibes y las duchas públicas, las fuentes actuales) va en el texto introductorio.
+- Al hacer scroll, la línea se llena como agua que avanza (script.js): una gota recorre el trazo, y cada punto se llena justo cuando el agua lo alcanza, con una onda que se expande.
+  - Los acontecimientos pendientes muestran un anillo gris. El actual se agranda, resalta su tarjeta y pinta su fecha de azul.
+  - Las cifras (130 familias, 162 suscriptores) cuentan desde cero la primera vez.
+  - Al llegar a la inauguración de 1980, su punto se vuelve lima y un destello de luz cruza la tarjeta.
+  - Las tarjetas entran desde la derecha. La foto se descubre como cortina y se acerca despacio mientras la sección cruza la pantalla.
+  - La línea se vuelve a medir sola si cambia el tamaño de la pantalla o del texto, así que siempre empieza y termina en el primer y el último punto.
+
+### Documentos y Transparencia
+- Sección entre la galería y contacto (ancla `#documentos`), con 22 documentos reales tomados del sitio anterior.
+- Cada documento muestra un ícono según su formato (PDF, Word, Excel…), su nombre, su categoría, la fecha de publicación y su peso, además de dos acciones: Ver (abre en una pestaña nueva) y Descargar.
+- Filtros por categoría con su cantidad y búsqueda por nombre que no distingue tildes ni mayúsculas.
+- Sin filtros se muestran los 8 más recientes y el resto con "Ver los 22 documentos". Si una búsqueda no encuentra nada, aparece un mensaje con un botón para ver todos.
+- En el celular las categorías forman una fila deslizable.
 
 ### Movimiento
 - Movimiento ligado a la interacción, sin bucles que distraigan:
@@ -61,7 +86,8 @@ Las fuentes se cargan desde Google Fonts; si no hay conexión se usan las fuente
 - Al cerrar cualquier modal, el foco vuelve al elemento que lo abrió y la página no se desplaza de lado.
 
 ### Navegación
-- Flechas flotantes en una píldora de cristal: recorren inicio, servicios, nosotros, instalaciones, contacto, preguntas frecuentes y pie de página.
+- Menú: Servicios, Nosotros, Historia, Instalaciones, Documentos y Contáctanos. Con seis enlaces, el menú en línea se usa desde 1101 px; por debajo se despliega desde el botón de menú (en tablet como tarjeta alineada a la derecha y en celular a todo el ancho).
+- Flechas flotantes en una píldora de cristal: recorren inicio, servicios, nosotros, historia, instalaciones, documentos, contacto, preguntas frecuentes y pie de página.
   - Al pasar el cursor, una etiqueta indica a qué sección van.
   - En pantallas amplias, un indicador de puntos marca la sección actual.
 - Desplazamiento propio entre secciones: acelera y frena con suavidad (0,6–1,15 s según la distancia). Se detiene si la persona usa la rueda, toca la pantalla o el teclado.
@@ -81,7 +107,7 @@ Las fuentes se cargan desde Google Fonts; si no hay conexión se usan las fuente
 - Modo claro declarado (`color-scheme`) para evitar que el modo oscuro forzado de algunos navegadores invierta los colores.
 
 ### Compatibilidad
-Navegadores modernos. Los efectos ligados al scroll (parallax, ondas, franja, nota lima y línea de progreso) usan `animation-timeline` y funcionan en Chrome, Edge y Safari recientes. En Firefox la página se ve completa, pero esos efectos quedan estáticos.
+Navegadores modernos. Los efectos ligados al scroll (parallax, ondas, franja, nota lima, acercamiento de la foto de la historia y línea de progreso) usan `animation-timeline` y funcionan en Chrome, Edge y Safari recientes. En Firefox la página se ve completa, pero esos efectos quedan estáticos. La línea de tiempo de la historia funciona en todos, porque se mueve con JavaScript.
 
 ## Personalización
 
@@ -91,11 +117,37 @@ Edita las plantillas `details-acueducto`, `details-alcantarillado` y `details-as
 
 ### Contacto
 
+La fila "Nuestro municipio" abre Google Maps centrado en Güepsa, Santander (en el celular abre la app). Si más adelante se quiere marcar la oficina exacta, reemplaza ese enlace en `index.html` (y `hasMap` en los datos estructurados) por el vínculo que da Google Maps en Compartir → Copiar vínculo.
+
 El teléfono es `316 784 6946`, WhatsApp usa el número internacional `573167846946` y el correo es `corpoguepsa@gmail.com`. Si cambian, actualiza:
 
 - Los enlaces en `index.html`.
 - Los datos estructurados (`application/ld+json`) en el `<head>`.
 - El generador del enlace de WhatsApp en `script.js`.
+
+### Nuestra historia
+
+El texto está en `index.html`, dentro del bloque `<div class="wrap history" id="historia">`:
+
+- Para editar la introducción, cambia los párrafos de `.history-intro`.
+- Para agregar un acontecimiento con fecha real, copia un `<li class="timeline-item">` dentro de `<ol class="timeline">`, en orden cronológico, con su fecha en `.timeline-date` (usa `<time datetime="AAAA-MM-DD">` si la fecha es exacta).
+- Para destacar un hito, agrega la clase `is-milestone`, como en la inauguración de 1980.
+- Mantén la línea de fuente (`.history-source`) si se incorpora material nuevo.
+
+### Documentos
+
+Para publicar un documento oficial:
+
+1. Copia el archivo en la subcarpeta de su categoría dentro de `documentos/`, con un nombre en minúsculas, sin tildes ni espacios (por ejemplo `documentos/estados-financieros/estados-financieros-2026.pdf`).
+2. Agrega una línea a `CORPOGUEPSA_DOCUMENTOS` en `documentos/registro.js`, con:
+   - `titulo`: el nombre que verá la comunidad.
+   - `categoria`: una de las claves de `CORPOGUEPSA_CATEGORIAS`.
+   - `archivo`: la ruta desde la raíz del sitio.
+   - `fecha` (opcional): en formato `AAAA-MM` o `AAAA-MM-DD`.
+   - `tamano` (opcional): por ejemplo `'1,6 MB'`.
+3. Sube el número de versión de `registro.js` (`?v=`) en `index.html`.
+
+Para crear una categoría, agrégala a `CORPOGUEPSA_CATEGORIAS`; su filtro aparece automáticamente en cuanto tenga al menos un documento. El formato y su ícono se toman de la extensión del archivo. El orden es automático: los más recientes primero.
 
 ### Imágenes
 
@@ -123,6 +175,10 @@ Revisado en navegador (Chromium):
   - Menú móvil, encabezado que se oculta, preguntas frecuentes y desplazamiento de las flechas.
 
 - **Zoom del visor:** el primer cuadro coincide exactamente con cada tarjeta (0 px de diferencia) en escritorio y celular. Se probaron también el cierre con X y con Escape, el cierre tras cambiar de foto y la reapertura sin residuos.
+- **Historia y documentos:**
+  - Los enlaces del menú, del pie y de las flechas flotantes llevan a sus secciones.
+  - Los 22 archivos responden como PDF en el servidor local, "Ver" abre en una pestaña nueva y "Descargar" tiene el atributo `download`.
+  - Se probaron los filtros por categoría, la búsqueda sin tildes, el estado vacío con su botón para volver a ver todos, y ampliar y contraer la lista.
+  - Sin desbordes de 320 a 1440 px; el menú en línea cabe desde 1101 px.
 
 La preferencia `prefers-reduced-motion` no se pudo emular en el navegador de pruebas; su tratamiento se revisó en el código. Lo propio del tacto (hover pegado, destello al tocar, respuesta al presionar, barra del navegador) no se reproduce en la emulación de escritorio: conviene confirmarlo en un celular real.
-#
